@@ -35,7 +35,7 @@ public class JellyLabApi {
     public void startAnalytics(String modName, String modVersion, String uuid) {
         System.out.println("[JellyLabAPI] " + modName + " " + modVersion + " started analytics with uuid " + uuid);
         try {
-            WSClient client = new WSClient(new URI("ws://localhost:8080"));
+            WSClient client = new WSClient(new URI("ws://localhost:38256"));
             client.connect();
         } catch (Exception e) {
             e.printStackTrace();
