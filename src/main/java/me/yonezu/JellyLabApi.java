@@ -16,6 +16,10 @@ import java.util.TimerTask;
  * @since 1.0
  */
 public class JellyLabApi {
+    private String modName;
+    private String modVersion;
+    private String uuid;
+    private String instanceID;
     private static JellyLabApi INSTANCE;
 
     public static JellyLabApi getInstance() {
@@ -32,11 +36,26 @@ public class JellyLabApi {
      * @param modVersion The version of the mod
      * @param uuid       The uuid of the player
      */
-    public void startAnalytics(String modName, String modVersion, String uuid) {
+    public void startAnalytics(String modName, String modVersion, String uuid, String instanceID) {
+        this.modName = modName;
+        this.modVersion = modVersion;
+        this.uuid = uuid;
+        this.instanceID = instanceID;
         System.out.println("[JellyLabAPI] " + modName + " " + modVersion + " started analytics with uuid " + uuid);
         try {
             WSClient client = new WSClient(new URI("ws://localhost:38256"));
             client.connect();
+            JsonObject jsonObject = new JsonObject();
+            JsonObject command = new JsonObject();
+            JsonObject metadata = new JsonObject();
+            command.addProperty("name", "initialise");
+            metadata.addProperty("modName", modName);
+            metadata.addProperty("modVersion", modVersion);
+            metadata.addProperty("uuid", uuid);
+            metadata.addProperty("instanceID", instanceID);
+            jsonObject.add("command", command);
+            jsonObject.add("metadata", metadata);
+            client.send(jsonObject.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -44,7 +63,7 @@ public class JellyLabApi {
 
     @PeriodicMethod(name = "sendPeriodicData", time = 60)
     public JsonObject sendPeriodicData() {
-        startAnalytics("JellyLabApi", "1.0", "uuid");
+        startAnalytics(modName, modVersion, uuid, instanceID);
         // some random data
         // Data interestingDate = Utils.getInterestingData();
         return new JsonObject();
